@@ -1,0 +1,56 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: slsea
+      MYSQL_USER: slsea
+      MYSQL_PASSWORD: slsea_password
+      MYSQL_ROOT_PASSWORD: local_root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - slsea_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -plocal_root_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mysql-test:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: slsea_test
+      MYSQL_USER: slsea_test
+      MYSQL_PASSWORD: slsea_test_password
+      MYSQL_ROOT_PASSWORD: local_test_root_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - slsea_mysql_test_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -plocal_test_root_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: .
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      DATABASE_URL: mysql://slsea:slsea_password@mysql:3306/slsea
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in the shell or .env}
+      JWT_ISSUER: slsea-solar-api
+      JWT_AUDIENCE: slsea-clients
+      ENABLE_MAINTENANCE: "false"
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      FRESHNESS_THRESHOLD_MINUTES: ${FRESHNESS_THRESHOLD_MINUTES:-60}
+    ports:
+      - "8080:8080"
+
+volumes:
+  slsea_mysql_data:
+  slsea_mysql_test_data:
