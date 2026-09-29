@@ -12,15 +12,9 @@ const provinces = [
   ['NWP', 'North Western'], ['NCP', 'North Central'], ['UP', 'Uva'], ['SG', 'Sabaragamuwa']
 ];
 const districtMap = [
-  ['CO', 'Colombo', 'WP'], ['GM', 'Gampaha', 'WP'], ['KT', 'Kalutara', 'WP'],
-  ['KY', 'Kandy', 'CP'], ['MT', 'Matale', 'CP'], ['NE', 'Nuwara Eliya', 'CP'],
-  ['GL', 'Galle', 'SP'], ['MR', 'Matara', 'SP'], ['HB', 'Hambantota', 'SP'],
-  ['JA', 'Jaffna', 'NP'], ['KI', 'Kilinochchi', 'NP'], ['MN', 'Mannar', 'NP'], ['MU', 'Mullaitivu', 'NP'], ['VA', 'Vavuniya', 'NP'],
-  ['BT', 'Batticaloa', 'EP'], ['AM', 'Ampara', 'EP'], ['TC', 'Trincomalee', 'EP'],
-  ['KU', 'Kurunegala', 'NWP'], ['PT', 'Puttalam', 'NWP'],
-  ['AN', 'Anuradhapura', 'NCP'], ['PO', 'Polonnaruwa', 'NCP'],
-  ['BD', 'Badulla', 'UP'], ['MO', 'Monaragala', 'UP'],
-  ['RT', 'Ratnapura', 'SG'], ['KE', 'Kegalle', 'SG']
+  ['CO', 'Colombo', 'WP'], ['GM', 'Gampaha', 'WP'], ['KT', 'Kalutara', 'WP'], ['KY', 'Kandy', 'CP'], ['MT', 'Matale', 'CP'], ['NE', 'Nuwara Eliya', 'CP'],
+  ['GL', 'Galle', 'SP'], ['MR', 'Matara', 'SP'], ['HB', 'Hambantota', 'SP'], ['JA', 'Jaffna', 'NP'], ['KI', 'Kilinochchi', 'NP'], ['MN', 'Mannar', 'NP'], ['MU', 'Mullaitivu', 'NP'], ['VA', 'Vavuniya', 'NP'],
+  ['BT', 'Batticaloa', 'EP'], ['AM', 'Ampara', 'EP'], ['TC', 'Trincomalee', 'EP'], ['KU', 'Kurunegala', 'NWP'], ['PT', 'Puttalam', 'NWP'], ['AN', 'Anuradhapura', 'NCP'], ['PO', 'Polonnaruwa', 'NCP'], ['BD', 'Badulla', 'UP'], ['MO', 'Monaragala', 'UP'], ['RT', 'Ratnapura', 'SG'], ['KE', 'Kegalle', 'SG']
 ];
 
 function stableId(namespace, value) {
@@ -73,7 +67,6 @@ async function main() {
     const provinceByCode = new Map(provinceRows.map((row) => [row.code, row]));
     const districtRows = districtMap.map(([code, name, provinceCode]) => ({ id: stableId('district', code), provinceId: provinceByCode.get(provinceCode).id, code, name }));
     await District.bulkCreate(districtRows, { transaction });
-
     const substationRows = districtRows.map((district) => ({ id: stableId('substation', district.code), districtId: district.id, code: `SYN-${district.code}-01`, name: `Synthetic ${district.name} Grid Substation`, latitude: 6.0, longitude: 80.7, isSynthetic: true }));
     await GridSubstation.bulkCreate(substationRows, { transaction });
     const installationRows = [];
@@ -81,7 +74,7 @@ async function main() {
       const substation = substationRows.find((row) => row.districtId === district.id);
       for (let index = 1; index <= 8; index += 1) {
         const id = stableId('installation', `${district.code}-${index}`);
-        installationRows.push({ id, gridSubstationId: substation.id, meterId: `SYN-METER-${district.code}-${String(index).padStart(2, '0')}`, inverterId: `SYN-INV-${district.code}-${String(index).padStart(2, '0')}`, deviceUsername: `device-${district.code.toLowerCase()}-${String(index).padStart(2, '2')}`, deviceSecretHash, name: `Synthetic ${district.name} Solar Installation ${index}`, capacityKw: 25 + index * 2, latitude: 6.0, longitude: 80.7, isSynthetic: true, version: 1 });
+        installationRows.push({ id, gridSubstationId: substation.id, meterId: `SYN-METER-${district.code}-${String(index).padStart(2, '0')}`, inverterId: `SYN-INV-${district.code}-${String(index).padStart(2, '0')}`, deviceUsername: `device-${district.code.toLowerCase()}-${String(index).padStart(2, '0')}`, deviceSecretHash, name: `Synthetic ${district.name} Solar Installation ${index}`, capacityKw: 25 + index * 2, latitude: 6.0, longitude: 80.7, isSynthetic: true, version: 1 });
       }
     }
     await SolarInstallation.bulkCreate(installationRows, { transaction, validate: true });
