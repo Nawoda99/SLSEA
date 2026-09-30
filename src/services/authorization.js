@@ -19,15 +19,22 @@ export function requireMaintenance(req, res, next) {
   return next();
 }
 
-export function locationIncludes(auth, filters = {}) {
-  const provinceWhere = {};
-  const districtWhere = {};
-  const substationWhere = {};
+function scopedId(requested, authorised) {
+  if (authorised && requested && requested !== authorised) return '__no_access__';
+  return requested ?? authorised;
+}
 
-  if (auth.role === 'provincial') provinceWhere.id = auth.provinceId;
-  if (auth.role === 'district') districtWhere.id = auth.districtId;
-  if (filters.provinceId) provinceWhere.id = filters.provinceId;
-  if (filters.districtId) districtWhere.id = filters.districtId;
+export function locationIncludes(auth, filters = {}) {
+  const provinceWhere = { deletedAt: null };
+  const districtWhere = { deletedAt: null };
+  const substationWhere = { deletedAt: null };
+
+  const authorisedProvince = auth.role === 'provincial' ? auth.provinceId : null;
+  const authorisedDistrict = auth.role === 'district' ? auth.districtId : null;
+  const provinceId = scopedId(filters.provinceId, authorisedProvince);
+  const districtId = scopedId(filters.districtId, authorisedDistrict);
+  if (provinceId) provinceWhere.id = provinceId;
+  if (districtId) districtWhere.id = districtId;
   if (filters.substationId) substationWhere.id = filters.substationId;
 
   return [{

@@ -1,5 +1,5 @@
 export const openapi = {
-  openapi: '3.0.3',
+  openapi: '3.1.0',
   info: {
     title: 'SLSEA Solar Generation Data API',
     version: '1.0.0',

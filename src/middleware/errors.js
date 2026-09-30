@@ -39,10 +39,13 @@ export function errorHandler(error, req, res, next) {
     apiError = badRequest('The supplied data is invalid', error.errors.map((item) => item.path));
   } else if (error?.type === 'entity.too.large') {
     apiError = new ApiError(413, 'payload_too_large', 'The request body is too large');
+  } else if (error instanceof SyntaxError && error.status === 400 && Object.hasOwn(error, 'body')) {
+    apiError = badRequest('Malformed JSON request body');
   }
 
   const status = Number.isInteger(apiError.status) ? apiError.status : 500;
   const requestId = req.requestId ?? 'unknown';
+  if (status === 401) res.set('WWW-Authenticate', 'Bearer realm="slsea-api"');
   if (status >= 500) logger.error({ err: error, requestId }, 'request failed');
   else logger.info({ status, code: apiError.code, requestId }, 'request rejected');
 

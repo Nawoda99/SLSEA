@@ -19,4 +19,4 @@ This mapping is intentionally factual. A row is marked as tested only when the c
 
 ## Explicit interpretation limitation
 
-The coursework brief and REST guidelines referenced by the request were not present in the supplied attachment directory. The CRUD conflict is therefore handled conservatively: maintenance metadata CRUD exists but is disabled by default; ordinary SLSEA users remain read-only; devices remain ingestion-only; historical readings remain append-only.
+The Coursework Brief, Marking Rubric, and Report Template were reviewed. The referenced REST API Design Guidelines white paper was not present, so its contents remain an explicit limitation. The CRUD conflict is handled conservatively: maintenance metadata CRUD exists but is disabled by default; ordinary SLSEA users remain read-only; devices remain ingestion-only; historical readings remain append-only.

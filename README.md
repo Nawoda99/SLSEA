@@ -2,7 +2,7 @@
 
 This repository contains a Node.js/Express REST API for the Sri Lanka Sustainable Energy Authority (SLSEA) solar-generation coursework scenario. It targets Richardson Maturity Model Level 2: noun-based plural resources, HTTP methods, status codes, nested resources, representations, and hyperlinks for pagination.
 
-The repository was empty when implementation started. No separate coursework brief, marking rubric, or REST API Design Guidelines were available in the supplied attachments; the pasted requirements are therefore the authoritative requirements used here. That missing-source limitation remains unresolved.
+The repository was empty when implementation started. The supplied Coursework Brief, Marking Rubric, and Report Template have now been reviewed. The referenced REST API Design Guidelines white paper was not present in the supplied files or repository, so its contents have not been invented.
 
 ## Runtime and prerequisites
 

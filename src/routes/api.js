@@ -13,8 +13,9 @@ import { districtSchema, installationSchema, loginDeviceSchema, loginUserSchema,
 
 export const router = Router();
 
-const authLimiter = rateLimit({ windowMs: 60_000, limit: 20, standardHeaders: true, legacyHeaders: false });
-const ingestionLimiter = rateLimit({ windowMs: 60_000, limit: 300, standardHeaders: true, legacyHeaders: false });
+const rateLimitResponse = (message) => (req, res) => res.status(429).json({ error: { code: 'rate_limit_exceeded', message }, requestId: req.requestId });
+const authLimiter = rateLimit({ windowMs: 60_000, limit: 20, standardHeaders: true, legacyHeaders: false, handler: rateLimitResponse('Too many authentication attempts; retry later') });
+const ingestionLimiter = rateLimit({ windowMs: 60_000, limit: 300, standardHeaders: true, legacyHeaders: false, handler: rateLimitResponse('Too many ingestion requests; retry later') });
 
 const active = { deletedAt: null };
 
@@ -138,7 +139,8 @@ async function accessibleDistrict(req, districtId) {
 async function accessibleProvince(req, provinceId) {
   const where = { ...active, id: provinceId };
   if (req.auth.role === 'provincial' && req.auth.provinceId !== provinceId) where.id = '__no_access__';
-  return Province.findOne({ where });
+  const include = req.auth.role === 'district' ? [{ model: District, as: 'districts', required: true, where: { ...active, id: req.auth.districtId }, attributes: [] }] : [];
+  return Province.findOne({ where, include });
 }
 
 async function accessibleSubstation(req, substationId) {
@@ -198,7 +200,11 @@ router.get('/provinces', authenticate, requireUser, asyncHandler(async (req, res
   const query = parseQuery(req.query);
   const where = { ...active };
   if (req.auth.role === 'provincial') where.id = req.auth.provinceId;
-  if (query.provinceId) where.id = req.auth.role === 'provincial' && query.provinceId !== req.auth.provinceId ? '__no_access__' : query.provinceId;
+  if (req.auth.role === 'district') {
+    const assignedDistrict = await District.findOne({ where: { ...active, id: req.auth.districtId }, attributes: ['provinceId'] });
+    where.id = assignedDistrict?.provinceId ?? '__no_access__';
+  }
+  if (query.provinceId) where.id = where.id && query.provinceId !== where.id ? '__no_access__' : query.provinceId;
   const result = await Province.findAndCountAll({ where, order: [['name', query.order]], limit: query.limit, offset: (query.page - 1) * query.limit });
   return sendRepresentation(req, res, paged(query, req, result.rows.map(serializeProvince), result.count), { lastModified: latestDate(...result.rows.map((row) => row.updatedAt)) });
 }));
