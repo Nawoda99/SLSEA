@@ -1,3 +1,5 @@
+import { config } from './config/config.js';
+
 export const openapi = {
   openapi: '3.1.0',
   info: {
@@ -5,7 +7,7 @@ export const openapi = {
     version: '1.0.0',
     description: 'Level 2 REST API for synthetic and operationally shaped solar generation data. Device tokens are ingestion-only; SLSEA user tokens are read-only unless the separately disabled maintenance capability is enabled.'
   },
-  servers: [{ url: 'http://localhost:8080', description: 'Local development' }],
+  servers: [{ url: config.apiBaseUrl, description: 'Configured API host' }],
   tags: [
     { name: 'Authentication' }, { name: 'Geography' }, { name: 'Installations' }, { name: 'Readings' }, { name: 'Summaries' }, { name: 'Maintenance' }
   ],

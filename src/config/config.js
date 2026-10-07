@@ -25,10 +25,13 @@ const positiveInteger = (value, fallback) => {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
 };
 
+const apiBaseUrl = (process.env.API_BASE_URL ?? '/').trim().replace(/\/+$/, '') || '/';
+
 export const config = Object.freeze({
   nodeEnv: process.env.NODE_ENV ?? 'development',
   isProduction,
   port: positiveInteger(process.env.PORT, 8080),
+  apiBaseUrl,
   databaseUrl: process.env.DATABASE_URL,
   testDatabaseUrl: process.env.TEST_DATABASE_URL ?? '',
   jwtSecret: jwtSecret || 'development-only-secret-change-me-please-123456',
