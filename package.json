@@ -10,9 +10,9 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "db:migrate": "node src/db/migrate.js",
-    "db:seed": "node src/db/seed.js",
-    "db:seed:reset": "node src/db/seed.js --reset",
+    "db:migrate": "node src/database/migrate.js",
+    "db:seed": "node src/database/seeders/seed.js",
+    "db:seed:reset": "node src/database/seeders/seed.js --reset",
     "test": "vitest run",
     "test:watch": "vitest",
     "check": "node --check src/server.js"

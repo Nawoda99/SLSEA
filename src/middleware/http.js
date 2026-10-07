@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { notAcceptable, unsupportedMedia } from './errors.js';
-import { logger } from '../utils/logger.js';
+import { logger } from '../shared/utils/logger.js';
 
 export function requestContext(req, res, next) {
   const supplied = req.get('X-Request-Id');

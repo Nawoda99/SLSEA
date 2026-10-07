@@ -3,9 +3,9 @@ import helmet from 'helmet';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import { config } from './config/config.js';
-import { sequelize } from './db/connection.js';
-import './models/models.js';
-import { router } from './routes/api.js';
+import { sequelize } from './database/connection.js';
+import './database/models/index.js';
+import { router } from './modules/api.routes.js';
 import { openapi } from './openapi.js';
 import { requestContext, requireJsonAccept, requireJsonBody } from './middleware/http.js';
 import { errorHandler, notFoundHandler } from './middleware/errors.js';
@@ -18,7 +18,8 @@ export function createApp() {
   app.use(requestContext);
   app.use(helmet());
   app.use(cors({ origin: (origin, callback) => {
-    if (!origin || config.corsOrigins.includes('*') || config.corsOrigins.includes(origin)) return callback(null, true);
+    const sameOrigin = [`http://localhost:${config.port}`, `http://127.0.0.1:${config.port}`].includes(origin);
+    if (!origin || sameOrigin || config.corsOrigins.includes('*') || config.corsOrigins.includes(origin)) return callback(null, true);
     return callback(new Error('Origin is not allowed by CORS'));
   }, credentials: false }));
   app.use(express.json({ limit: '32kb', strict: true }));

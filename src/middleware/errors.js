@@ -1,5 +1,5 @@
 import { UniqueConstraintError, ValidationError as SequelizeValidationError } from 'sequelize';
-import { logger } from '../utils/logger.js';
+import { logger } from '../shared/utils/logger.js';
 
 export class ApiError extends Error {
   constructor(status, code, message, details = undefined) {

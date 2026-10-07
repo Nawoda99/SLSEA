@@ -1,7 +1,7 @@
 import { app } from './app.js';
 import { config } from './config/config.js';
-import { sequelize, closeDatabase } from './db/connection.js';
-import { logger } from './utils/logger.js';
+import { sequelize, closeDatabase } from './database/connection.js';
+import { logger } from './shared/utils/logger.js';
 
 let server;
 
